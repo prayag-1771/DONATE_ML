@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -11,11 +13,12 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-function handleSubmit(){
-  console.log("Hii");
-}
 
 export default function CardDemo() {
+  const navigate = useNavigate()
+  function handleSubmit(){
+    navigate("/Donation")
+  }
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <Card className="w-full max-w-sm">
@@ -56,7 +59,7 @@ export default function CardDemo() {
           </form>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full" onClick={handleSubmit}>
+          <Button type="button" className="w-full" onClick={handleSubmit}>
             Login
           </Button>
           <Button variant="outline" className="w-full">
