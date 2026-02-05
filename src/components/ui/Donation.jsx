@@ -9,7 +9,15 @@ export default function Donation() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {ngos.map((ngo, index) => (
-          <SimpleCard key={index} name={ngo.name} desc={ngo.description} />
+          <SimpleCard
+            key={index}
+            name={ngo.name}
+            desc={ngo.description}
+            logo={ngo.logo}
+            cause={ngo.cause}
+            donateUrl={ngo.donateUrl}
+            website={ngo.website}
+          />
         ))}
       </div>
     </div>
