@@ -16,30 +16,72 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { signIn } from "next-auth/react";
+
 export default function CardDemo() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [formError, setFormError] = useState("");
+
+  const [emailFocus, setEmailFocus] = useState(false);
+  const [passwordFocus, setPasswordFocus] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  function validate() {
+    let ok = true;
+
+    setEmailError("");
+    setPasswordError("");
+    setFormError("");
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      setEmailError("Enter a valid email address");
+      ok = false;
+    }
+
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      ok = false;
+    }
+
+    return ok;
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError("");
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    if (!validate()) return;
 
-    if (!res.ok) {
-      const data = await res.json();
-      setError(data.error || "Login failed");
-      return;
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setFormError(data.error || "Login failed");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/donation");
+    } catch (err) {
+      setFormError("Server not reachable");
+      setLoading(false);
     }
-
-    router.push("/donation");
   }
 
   return (
@@ -51,52 +93,84 @@ export default function CardDemo() {
             Enter your email below to login to your account
           </CardDescription>
           <CardAction>
-            <Button variant="link" onClick={() => router.push("/register")}>Sign Up</Button>
+            <Button variant="link" onClick={() => router.push("/register")}>
+              Sign Up
+            </Button>
           </CardAction>
         </CardHeader>
 
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
+              {/* Email */}
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="m@example.com"
-                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onFocus={() => setEmailFocus(true)}
+                  onBlur={() => {
+                    setEmailFocus(false);
+                    validate();
+                  }}
                 />
+
+                {emailError && !emailFocus && (
+                  <p className="text-sm text-red-500">{emailError}</p>
+                )}
               </div>
 
+              {/* Password */}
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
-                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onFocus={() => setPasswordFocus(true)}
+                  onBlur={() => {
+                    setPasswordFocus(false);
+                    validate();
+                  }}
                 />
+
+                {passwordError && !passwordFocus && (
+                  <p className="text-sm text-red-500">
+                    {passwordError}
+                  </p>
+                )}
               </div>
 
-              {error && (
-                <div className="text-sm text-red-500">{error}</div>
+              {formError && (
+                <p className="text-sm text-red-500">{formError}</p>
               )}
             </div>
           </form>
         </CardContent>
 
         <CardFooter className="flex-col gap-2">
-          <Button className="w-full" onClick={handleSubmit}>
-            Login
+          <Button
+            className="w-full"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
           </Button>
 
-          <Button variant="outline" className="w-full">
-            Login with Google!
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={googleLoading || loading}
+            onClick={() => {
+              setGoogleLoading(true);
+              signIn("google", { callbackUrl: "/donation" });
+            }}
+          >
+            {googleLoading ? "Opening Google..." : "Login with Google"}
           </Button>
         </CardFooter>
       </Card>
