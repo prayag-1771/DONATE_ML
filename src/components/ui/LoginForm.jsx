@@ -41,14 +41,23 @@ export default function CardDemo() {
     setPasswordError("");
     setFormError("");
 
+    const emailTrim = email.trim();
+    const passwordTrim = password.trim();
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(email)) {
+    if (!emailTrim) {
+      setEmailError("Email is required");
+      ok = false;
+    } else if (!emailRegex.test(emailTrim)) {
       setEmailError("Enter a valid email address");
       ok = false;
     }
 
-    if (password.length < 6) {
+    if (!passwordTrim) {
+      setPasswordError("Password is required");
+      ok = false;
+    } else if (passwordTrim.length < 6) {
       setPasswordError("Password must be at least 6 characters");
       ok = false;
     }
@@ -67,7 +76,10 @@ export default function CardDemo() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password,
+        }),
       });
 
       if (!res.ok) {
@@ -102,7 +114,6 @@ export default function CardDemo() {
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
-              {/* Email */}
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -123,7 +134,6 @@ export default function CardDemo() {
                 )}
               </div>
 
-              {/* Password */}
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
                 <Input

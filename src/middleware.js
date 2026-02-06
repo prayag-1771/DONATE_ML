@@ -11,7 +11,7 @@ export function middleware(request) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
-  }
+  } 
 
   return NextResponse.next();
 }

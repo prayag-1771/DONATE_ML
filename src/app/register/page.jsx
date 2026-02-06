@@ -77,7 +77,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // after successful register, go to login page
       router.push("/");
     } catch (err) {
       setFormError("Server not reachable");
@@ -116,7 +115,6 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              {/* Email */}
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
