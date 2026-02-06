@@ -1,4 +1,4 @@
-export const runtime = "nodejs"; // ✅ IMPORTANT (bcrypt needs Node)
+export const runtime = "nodejs"; 
 
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
@@ -16,7 +16,6 @@ export async function POST(req) {
       );
     }
 
-    // (optional but matches your UI validation idea)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email)) {
